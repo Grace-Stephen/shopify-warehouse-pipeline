@@ -1,0 +1,77 @@
+name: Deploy Shopify Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      
+      # 1. AUTHENTICATE WITH AWS USING OIDC 
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # 2. TERRAFORM SETUP & INIT 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      ###############################################################
+      # 3. TARGETED DEPLOY: CREATE S3 BUCKET FOR LAMBDA ONLY
+      ###############################################################
+      - name: Terraform Apply (S3 Bucket Only)
+        working-directory: terraform
+        run: |
+          # Apply ONLY the S3 bucket resource to ensure it exists
+          terraform apply -auto-approve \
+            -target="aws_s3_bucket.lambda_artifacts" \
+            -var "lambda_artifacts_bucket=${{ secrets.LAMBDA_BUCKET }}"
+      
+      ###############################################################
+      # 4. BUILD AND UPLOAD ARTIFACT 
+      ###############################################################
+      - name: Build Lambda Package
+        run: |
+          cd lambda_code 
+          pip install -r requirements.txt -t .
+          zip -r lambda.zip .
+
+      - name: Upload Lambda ZIP to S3
+        run: |
+          # the S3 bucket is guaranteed to exist
+          aws s3 cp lambda_code/lambda.zip "s3://${{ secrets.LAMBDA_BUCKET }}/lambda.zip"
+
+      ###############################################################
+      # 5. FULL TERRAFORM PLAN/APPLY (Deploys the rest of the Infra)
+      ###############################################################
+      - name: Terraform Plan (Full Infra)
+        working-directory: terraform
+        run: |
+          # Plan for all remaining resources (Lambda, IAM, etc.)
+          terraform plan \
+            -var "lambda_artifacts_bucket=${{ secrets.LAMBDA_BUCKET }}" \
+            -var "lambda_zip_key=lambda.zip"
+
+      - name: Terraform Apply (Full Infra)
+        if: github.ref == 'refs/heads/main'
+        working-directory: terraform
+        run: |
+          # Apply all remaining resources
+          terraform apply -auto-approve \
+            -var "lambda_artifacts_bucket=${{ secrets.LAMBDA_BUCKET }}" \
+            -var "lambda_zip_key=lambda.zip"
