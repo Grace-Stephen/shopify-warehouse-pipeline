@@ -38,7 +38,9 @@ jobs:
           terraform apply -auto-approve \
             -target="aws_s3_bucket.lambda_artifacts" \
             -var "lambda_artifacts_bucket=${{ secrets.LAMBDA_BUCKET }}" \
-            -var "account_id=${{ secrets.ACCOUNT_ID }}"
+            -var "account_id=${{ secrets.ACCOUNT_ID }}" \
+            -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \ 
+            -var "master_password=${{ secrets.MASTER_PASSWORD }}"
 
       #################################################################
       # 4. BUILD AND UPLOAD ARTIFACT
