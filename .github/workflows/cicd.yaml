@@ -13,66 +13,74 @@ jobs:
       contents: read
 
     steps:
+      # ----------------------------------------
+      # 1. CHECKOUT
+      # ----------------------------------------
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 1. AUTHENTICATE WITH AWS USING OIDC
-      - name: Configure AWS Credentials via OIDC
+      # ----------------------------------------
+      # 2. AUTHENTICATE WITH AWS USING OIDC
+      # ----------------------------------------
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      # 2. TERRAFORM SETUP & INIT
+      # ----------------------------------------
+      # 3. TERRAFORM INIT
+      # ----------------------------------------
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform init
 
-      #################################################################
-      # 3. TARGETED DEPLOY: CREATE S3 BUCKET FOR LAMBDA ONLY
-      #################################################################
-      - name: Terraform Apply (S3 Bucket Only)
+      # ----------------------------------------
+      # 4. FULL TERRAFORM APPLY — CREATE ALL INFRA
+      # (INCLUDING THE LAMBDA ARTIFACT BUCKET)
+      # ----------------------------------------
+      - name: Terraform Plan (infra only)
         run: |
-          terraform apply -auto-approve \
-            -target="aws_s3_bucket.lambda_artifacts" \
-            -var "lambda_artifacts_bucket=${{ secrets.LAMBDA_BUCKET }}" \
+          terraform plan \
             -var "account_id=${{ secrets.ACCOUNT_ID }}" \
             -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
             -var "master_password=${{ secrets.MASTER_PASSWORD }}"
 
-      #################################################################
-      # 4. BUILD AND UPLOAD ARTIFACT
-      #################################################################
+      - name: Terraform Apply (infra only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          terraform apply -auto-approve \
+            -var "account_id=${{ secrets.ACCOUNT_ID }}" \
+            -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
+            -var "master_password=${{ secrets.MASTER_PASSWORD }}"
+
+      # ----------------------------------------
+      # 5. BUILD LAMBDA ZIP
+      # ----------------------------------------
       - name: Build Lambda Package
         run: |
           cd lambda_code
           pip install -r requirements.txt -t .
           zip -r lambda.zip .
 
+      # ----------------------------------------
+      # 6. UPLOAD ZIP TO ARTIFACT BUCKET
+      # ----------------------------------------
       - name: Upload Lambda ZIP to S3
         run: |
           aws s3 cp lambda_code/lambda.zip "s3://${{ secrets.LAMBDA_BUCKET }}/lambda.zip"
 
-      #################################################################
-      # 5. FULL TERRAFORM PLAN/APPLY (ALL INFRA INCLUDING REDSHIFT)
-      #################################################################
-      - name: Terraform Plan (Full Infra)
-        run: |
-          terraform plan \
-            -var "lambda_artifacts_bucket=${{ secrets.LAMBDA_BUCKET }}" \
-            -var "lambda_zip_key=lambda.zip" \
-            -var "account_id=${{ secrets.ACCOUNT_ID }}" \
-            -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
-            -var "master_password=${{ secrets.MASTER_PASSWORD }}"
 
-      - name: Terraform Apply (Full Infra)
+      # ----------------------------------------
+      # 7. APPLY AGAIN TO UPDATE LAMBDA CODE
+      # ----------------------------------------
+      - name: Terraform Apply (update lambda code)
         if: github.ref == 'refs/heads/main'
         run: |
           terraform apply -auto-approve \
-            -var "lambda_artifacts_bucket=${{ secrets.LAMBDA_BUCKET }}" \
-            -var "lambda_zip_key=lambda.zip" \
             -var "account_id=${{ secrets.ACCOUNT_ID }}" \
             -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
-            -var "master_password=${{ secrets.MASTER_PASSWORD }}"
+            -var "master_password=${{ secrets.MASTER_PASSWORD }}" \
+            -var "lambda_zip_key=lambda.zip"
