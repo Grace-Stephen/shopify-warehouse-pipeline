@@ -38,6 +38,22 @@ jobs:
         run: terraform init
 
       # ----------------------------------------
+      # 5. BUILD LAMBDA ZIP
+      # ----------------------------------------
+      - name: Build Lambda Package
+        run: |
+          cd lambda_code
+          pip install -r requirements.txt -t .
+          zip -r lambda.zip .
+
+      # ----------------------------------------
+      # 6. UPLOAD ZIP TO ARTIFACT BUCKET
+      # ----------------------------------------
+      - name: Upload Lambda ZIP to S3
+        run: |
+          aws s3 cp lambda_code/lambda.zip "s3://${{ secrets.LAMBDA_BUCKET }}/lambda.zip"
+          
+      # ----------------------------------------
       # 4. FULL TERRAFORM APPLY — CREATE ALL INFRA
       # (INCLUDING THE LAMBDA ARTIFACT BUCKET)
       # ----------------------------------------
@@ -55,22 +71,6 @@ jobs:
             -var "account_id=${{ secrets.ACCOUNT_ID }}" \
             -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
             -var "master_password=${{ secrets.MASTER_PASSWORD }}"
-
-      # ----------------------------------------
-      # 5. BUILD LAMBDA ZIP
-      # ----------------------------------------
-      - name: Build Lambda Package
-        run: |
-          cd lambda_code
-          pip install -r requirements.txt -t .
-          zip -r lambda.zip .
-
-      # ----------------------------------------
-      # 6. UPLOAD ZIP TO ARTIFACT BUCKET
-      # ----------------------------------------
-      - name: Upload Lambda ZIP to S3
-        run: |
-          aws s3 cp lambda_code/lambda.zip "s3://${{ secrets.LAMBDA_BUCKET }}/lambda.zip"
 
 
       # ----------------------------------------
