@@ -17,6 +17,8 @@ module "lambda" {
   project_prefix   = var.project_prefix
   lambda_role_arn  = module.iam.lambda_role_arn
   raw_bucket_name  = module.s3.raw_bucket_name
+  lambda_artifacts_bucket = module.s3.lambda_artifacts_bucket_name
+  lambda_zip_key          = "lambda.zip"
 }
 
 module "network" {
