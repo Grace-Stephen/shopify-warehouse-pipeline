@@ -28,14 +28,12 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        working-directory: terraform
         run: terraform init
 
       ###############################################################
       # 3. TARGETED DEPLOY: CREATE S3 BUCKET FOR LAMBDA ONLY
       ###############################################################
       - name: Terraform Apply (S3 Bucket Only)
-        working-directory: terraform
         run: |
           # Apply ONLY the S3 bucket resource to ensure it exists
           terraform apply -auto-approve \
@@ -60,7 +58,6 @@ jobs:
       # 5. FULL TERRAFORM PLAN/APPLY (Deploys the rest of the Infra)
       ###############################################################
       - name: Terraform Plan (Full Infra)
-        working-directory: terraform
         run: |
           # Plan for all remaining resources (Lambda, IAM, etc.)
           terraform plan \
@@ -69,7 +66,6 @@ jobs:
 
       - name: Terraform Apply (Full Infra)
         if: github.ref == 'refs/heads/main'
-        working-directory: terraform
         run: |
           # Apply all remaining resources
           terraform apply -auto-approve \
