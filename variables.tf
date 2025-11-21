@@ -28,5 +28,6 @@ variable "master_password" {
 
 variable "lambda_zip_key" {
   type = string
+  default = "lambda.zip"
 }
 
