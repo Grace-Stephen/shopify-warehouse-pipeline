@@ -26,3 +26,7 @@ variable "master_password" {
   sensitive   = true
 }
 
+variable "lambda_zip_key" {
+  type = string
+}
+
