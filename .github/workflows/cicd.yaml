@@ -40,50 +40,50 @@ jobs:
       # ----------------------------------------
       # 5. BUILD LAMBDA ZIP
       # ----------------------------------------
-      # - name: Build Lambda Package
-      #   run: |
-      #     cd lambda_code
-      #     pip install -r requirements.txt -t .
-      #     zip -r lambda.zip .
+      - name: Build Lambda Package
+        run: |
+          cd lambda_code
+          pip install -r requirements.txt -t .
+          zip -r lambda.zip .
 
       # ----------------------------------------
       # 6. UPLOAD ZIP TO ARTIFACT BUCKET
       # ----------------------------------------
-      # - name: Upload Lambda ZIP to S3
-      #   run: |
-      #     aws s3 cp lambda_code/lambda.zip "s3://${{ secrets.LAMBDA_BUCKET }}/lambda.zip"
+      - name: Upload Lambda ZIP to S3
+        run: |
+          aws s3 cp lambda_code/lambda.zip "s3://${{ secrets.LAMBDA_BUCKET }}/lambda.zip"
 
       # ----------------------------------------
       # 4. FULL TERRAFORM APPLY — CREATE ALL INFRA
       # (INCLUDING THE LAMBDA ARTIFACT BUCKET)
       # ----------------------------------------
-      # - name: Terraform Plan (infra only)
-      #   run: |
-      #     terraform plan \
-      #       -var "account_id=${{ secrets.ACCOUNT_ID }}" \
-      #       -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
-      #       -var "master_password=${{ secrets.MASTER_PASSWORD }}"
+      - name: Terraform Plan (infra only)
+        run: |
+          terraform plan \
+            -var "account_id=${{ secrets.ACCOUNT_ID }}" \
+            -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
+            -var "master_password=${{ secrets.MASTER_PASSWORD }}"
 
-      # - name: Terraform Apply (infra only)
-      #   if: github.ref == 'refs/heads/main'
-      #   run: |
-      #     terraform apply -auto-approve \
-      #       -var "account_id=${{ secrets.ACCOUNT_ID }}" \
-      #       -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
-      #       -var "master_password=${{ secrets.MASTER_PASSWORD }}"
+      - name: Terraform Apply (infra only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          terraform apply -auto-approve \
+            -var "account_id=${{ secrets.ACCOUNT_ID }}" \
+            -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
+            -var "master_password=${{ secrets.MASTER_PASSWORD }}"
 
 
       # ----------------------------------------
       # 7. APPLY AGAIN TO UPDATE LAMBDA CODE
       # ----------------------------------------
-      # - name: Terraform Apply (update lambda code)
-      #   if: github.ref == 'refs/heads/main'
-      #   run: |
-      #     terraform apply -auto-approve \
-      #       -var "account_id=${{ secrets.ACCOUNT_ID }}" \
-      #       -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
-      #       -var "master_password=${{ secrets.MASTER_PASSWORD }}" \
-      #       -var "lambda_zip_key=lambda.zip"
+      - name: Terraform Apply (update lambda code)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          terraform apply -auto-approve \
+            -var "account_id=${{ secrets.ACCOUNT_ID }}" \
+            -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
+            -var "master_password=${{ secrets.MASTER_PASSWORD }}" \
+            -var "lambda_zip_key=lambda.zip"
 
       # 8. Terraform destroy
       - name: Terraform Destroy

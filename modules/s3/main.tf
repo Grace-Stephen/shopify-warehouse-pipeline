@@ -5,6 +5,8 @@
 resource "aws_s3_bucket" "raw_data" {
   bucket = "${var.project_prefix}-raw-data"
 
+  force_destroy = true
+
   tags = {
     Project = var.project_prefix
     Purpose = "Shopify Raw Data Storage"
@@ -33,6 +35,8 @@ resource "aws_s3_bucket_versioning" "raw_versioning" {
 resource "aws_s3_bucket" "glue_scripts" {
   bucket = "${var.project_prefix}-glue-scripts"
 
+  force_destroy = true
+
   tags = {
     Project = var.project_prefix
     Purpose = "Glue ETL Scripts Storage"
@@ -51,6 +55,7 @@ resource "aws_s3_bucket_versioning" "glue_scripts_versioning" {
 #S3 BUCKET FOR CLOUDTRAIL LOGS
 resource "aws_s3_bucket" "cloudtrail_logs" {
   bucket = "${var.project_prefix}-cloudtrail-logs"
+  force_destroy = true
 }
 
 ###########################################
@@ -59,6 +64,8 @@ resource "aws_s3_bucket" "cloudtrail_logs" {
 
 resource "aws_s3_bucket" "lambda_artifacts" {
   bucket = "${var.project_prefix}-lambda-artifacts"
+
+  force_destroy = true
 
   tags = {
     Project = var.project_prefix
