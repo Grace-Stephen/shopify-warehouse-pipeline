@@ -46,6 +46,9 @@ module "glue" {
   raw_bucket          = module.s3.raw_bucket_name
   glue_role_arn       = module.iam.glue_role_arn
   eventbridge_role_arn = module.iam.eventbridge_role_arn
+  eventbridge_role_dependencies = [
+    module.iam.eventbridge_role_arn   # forces ordering
+  ]
   redshift_namespace  = module.redshift.redshift_namespace_name
   redshift_workgroup  = module.redshift.redshift_workgroup_name
   redshift_admin_username = module.redshift.redshift_admin_username

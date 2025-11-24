@@ -64,4 +64,9 @@ variable "glue_security_group_ids" {
   type        = list(string)
 }
 
+variable "eventbridge_role_dependencies" {
+  type = list(any)
+}
+
+
 
