@@ -85,11 +85,11 @@ jobs:
             -var "master_password=${{ secrets.MASTER_PASSWORD }}" \
             -var "lambda_zip_key=lambda.zip"
 
-      # 8. Terraform destroy
-      - name: Terraform Destroy
-        run: |
-          terraform destroy -auto-approve \
-            -var "account_id=${{ secrets.ACCOUNT_ID }}" \
-            -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
-            -var "master_password=${{ secrets.MASTER_PASSWORD }}" \
-            -var "lambda_zip_key=lambda.zip"
+      # # 8. Terraform destroy
+      # - name: Terraform Destroy
+      #   run: |
+      #     terraform destroy -auto-approve \
+      #       -var "account_id=${{ secrets.ACCOUNT_ID }}" \
+      #       -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
+      #       -var "master_password=${{ secrets.MASTER_PASSWORD }}" \
+      #       -var "lambda_zip_key=lambda.zip"
