@@ -129,7 +129,7 @@ resource "aws_glue_connection" "redshift_serverless" {
 # Allow EventBridge to trigger Glue workflows
 resource "aws_glue_resource_policy" "allow_eventbridge" {
   depends_on = [
-    var.eventbridge_role_dependencies
+    modules.iam.eventbridge_role
   ]
   policy = jsonencode({
     Version = "2012-10-17"
@@ -138,7 +138,7 @@ resource "aws_glue_resource_policy" "allow_eventbridge" {
         Sid: "AllowEventBridgeToStartWorkflow",
         Effect: "Allow",
         Principal: {
-          AWS: var.eventbridge_role_arn
+          AWS: module.iam.eventbridge_role
         },
         Action: [
           "glue:StartWorkflowRun",
