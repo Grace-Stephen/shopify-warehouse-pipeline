@@ -59,6 +59,11 @@ variable "eventbridge_role_arn" {
   type        = string
 }
 
+variable "eventbridge_role" {
+  description = "the EventBridge role that triggers Glue"
+  type        = string
+}
+
 variable "glue_security_group_ids" {
   description = "List of security groups for the Glue job connection"
   type        = list(string)

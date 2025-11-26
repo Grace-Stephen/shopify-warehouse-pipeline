@@ -146,5 +146,5 @@ resource "aws_glue_resource_policy" "allow_eventbridge" {
       }
     ]
   })
-  depends_on = [ var.eventbridge_role_arn ]
+  depends_on = [ var.eventbridge_role ]
 }
