@@ -126,3 +126,28 @@ resource "aws_glue_connection" "redshift_serverless" {
 }
 
 
+#EventBridge to Glue Trust Policy
+resource "aws_glue_resource_policy" "allow_eventbridge" {
+  depends_on = [
+    aws_iam_role.eventbridge_role
+  ]
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid     = "AllowEventBridgeToStartWorkflow"
+        Effect  = "Allow"
+        Principal = {
+          AWS = aws_iam_role.eventbridge_role.arn
+        }
+        Action = [
+          "glue:StartWorkflowRun",
+          "glue:StartJobRun",
+          "glue:StartCrawler"
+        ]
+        Resource = "arn:aws:glue:${var.aws_region}:${data.aws_caller_identity.current.account_id}:workflow/${var.project_prefix}-workflow"
+      }
+    ]
+  })
+}
