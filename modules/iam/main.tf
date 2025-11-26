@@ -314,7 +314,7 @@ resource "aws_glue_resource_policy" "allow_eventbridge" {
         Sid: "AllowEventBridgeToStartWorkflow",
         Effect: "Allow",
         Principal: {
-          AWS: module.iam.eventbridge_role
+          AWS: aws_iam_role.eventbridge_role.arn
         },
         Action: [
           "glue:StartWorkflowRun",
