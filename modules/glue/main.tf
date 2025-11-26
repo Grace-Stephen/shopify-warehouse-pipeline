@@ -140,7 +140,8 @@ resource "aws_glue_resource_policy" "allow_eventbridge" {
         Action = [
           "glue:StartWorkflowRun",
           "glue:StartJobRun",
-          "glue:StartCrawler"
+          "glue:StartCrawler",
+          "glue:NotifyEvent"
         ]
         Resource = "arn:aws:glue:${var.aws_region}:${data.aws_caller_identity.current.account_id}:workflow/${var.project_prefix}-workflow"
       }
