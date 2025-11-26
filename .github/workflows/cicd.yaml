@@ -39,7 +39,7 @@ jobs:
 
       - name: Terraform apply S3 only
         run: |
-          terraform apply -target=modules.s3 -auto-approve \
+          terraform apply -target=module.s3 -auto-approve \
             -var "account_id=${{ secrets.ACCOUNT_ID }}" \
             -var "admin_username=${{ secrets.ADMIN_USERNAME }}" \
             -var "master_password=${{ secrets.MASTER_PASSWORD }}"
