@@ -103,7 +103,11 @@ CI/CD Workflow Summary
 
 GitHub Actions uses federated identity to request temporary AWS credentials.
 
-2. Lambda Packaging Stage
+2. Targeted s3 module deployment
+
+for a successful deployment of Lambda via CICD, lambda code must be zipped and uploaded to a dedicated s3 bucket. So s3 module had to be deployed before the rest of the infrastructure.
+
+3. Lambda Packaging Stage
 
 The workflow:
 
@@ -113,7 +117,7 @@ The workflow:
 
 - Terraform references this artifact as the Lambda source.
 
-3. Terraform Automation
+4. The rest of the infra is deployed
 
 On each push:
 
@@ -124,8 +128,6 @@ On each push:
 - terraform apply (for main branch only)
 
 Terraform provisions:
-
-- S3 buckets (raw, glue script, logs, lambda artifacts)
 
 - IAM roles for Lambda, Glue, RedShift, EventBridge and QuickSight
 
@@ -141,7 +143,7 @@ Terraform provisions:
 
 - Redshift serverless
 
-4. Secrets Management
+5. Secrets Management
 
 GitHub Secrets store:
 
