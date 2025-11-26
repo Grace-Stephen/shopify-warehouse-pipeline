@@ -47,7 +47,7 @@ module "glue" {
   raw_bucket          = module.s3.raw_bucket_name
   glue_role_arn       = module.iam.glue_role_arn
   eventbridge_role_arn = module.iam.eventbridge_role_arn
-  eventbridge_role_res  = module.iam.eventbridge_role
+  eventbridge_role  = module.iam.eventbridge_role
   # eventbridge_role_dependencies = [
   #   module.iam   # forces ordering
   # ]
