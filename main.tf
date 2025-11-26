@@ -5,6 +5,7 @@ module "iam" {
   raw_bucket_arn          = module.s3.raw_bucket_arn
   glue_scripts_bucket_arn = module.s3.glue_scripts_bucket_arn
   cloudtrail_logs_bucket_name    = module.s3.cloudtrail_logs_bucket_name
+  aws_region     = var.aws_region
 }
 
 module "s3" {
@@ -47,7 +48,7 @@ module "glue" {
   glue_role_arn       = module.iam.glue_role_arn
   eventbridge_role_arn = module.iam.eventbridge_role_arn
   # eventbridge_role_dependencies = [
-  #   module.iam.eventbridge_role_arn   # forces ordering
+  #   module.iam   # forces ordering
   # ]
   redshift_namespace  = module.redshift.redshift_namespace_name
   redshift_workgroup  = module.redshift.redshift_workgroup_name

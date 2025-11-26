@@ -305,3 +305,25 @@ resource "aws_iam_role_policy_attachment" "quicksight_attach_policy" {
   policy_arn = aws_iam_policy.quicksight_vpc_policy.arn
 }
 
+# Allow EventBridge to trigger Glue workflows
+resource "aws_glue_resource_policy" "allow_eventbridge" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid: "AllowEventBridgeToStartWorkflow",
+        Effect: "Allow",
+        Principal: {
+          AWS: module.iam.eventbridge_role
+        },
+        Action: [
+          "glue:StartWorkflowRun",
+          "glue:StartJobRun",
+          "glue:StartCrawler"
+        ],
+        Resource = "arn:aws:glue:${var.aws_region}:${data.aws_caller_identity.current.account_id}:workflow/${var.project_prefix}-workflow"
+      }
+    ]
+  })
+}
+

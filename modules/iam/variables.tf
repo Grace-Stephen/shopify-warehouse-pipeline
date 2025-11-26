@@ -14,6 +14,12 @@ variable "project_prefix" {
   default     = "ogoma"
 }
 
+variable "aws_region" {
+  description = "AWS region for resource deployment"
+  type        = string
+  default     = "us-east-1"
+}
+
 variable "cloudtrail_logs_bucket_name" {
   description = "Bucket where CloudTrail logs are stored"
   type        = string
