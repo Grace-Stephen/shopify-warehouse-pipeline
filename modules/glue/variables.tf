@@ -60,8 +60,7 @@ variable "eventbridge_role_arn" {
 }
 
 variable "eventbridge_role" {
-  description = "the EventBridge role that triggers Glue"
-  type        = string
+  type        = any
 }
 
 variable "glue_security_group_ids" {
