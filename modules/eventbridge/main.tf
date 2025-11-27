@@ -3,8 +3,8 @@ data "aws_caller_identity" "current" {}
 # EventBridge Rule 1: Trigger Lambda every hour to fetch data
 resource "aws_cloudwatch_event_rule" "lambda_schedule_rule" {
   name                = "${var.project_prefix}-lambda-schedule"
-  description         = "Trigger Lambda every twenty minutes to fetch data"
-  schedule_expression = "rate(20 minutes)"
+  description         = "Trigger Lambda every fifteen minutes to fetch data"
+  schedule_expression = "rate(15 minutes)"
 }
 
 resource "aws_cloudwatch_event_target" "lambda_target" {

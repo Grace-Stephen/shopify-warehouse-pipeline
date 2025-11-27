@@ -13,11 +13,11 @@ resource "aws_s3_bucket" "raw_data" {
   }
 }
 
-# Allow S3 to send events to EventBridge
-resource "aws_s3_bucket_notification" "raw_data_events" {
-  bucket = aws_s3_bucket.raw_data.id
-  eventbridge = true
-}
+# # Allow S3 to send events to EventBridge
+# resource "aws_s3_bucket_notification" "raw_data_events" {
+#   bucket = aws_s3_bucket.raw_data.id
+#   eventbridge = true
+# }
 
 # Enable versioning for data traceability
 resource "aws_s3_bucket_versioning" "raw_versioning" {
