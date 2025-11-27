@@ -21,7 +21,7 @@ resource "aws_cloudwatch_event_rule" "glue_trigger_rule" {
   description = "Trigger Glue workflow when new data lands in S3 raw bucket"
 
   event_pattern = jsonencode({
-    "source" = ["aws.s3"],
+    "source" = ["aws.cloudtrail"],
     "detail-type" = ["AWS API Call via CloudTrail"],
     "detail" = {
       "eventSource" = ["s3.amazonaws.com"],
