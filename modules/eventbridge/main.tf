@@ -19,18 +19,25 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
 resource "aws_cloudwatch_event_rule" "glue_trigger_rule" {
   name        = "${var.project_prefix}-glue_trigger_rule"
   description = "Trigger Glue workflow when new data lands in S3 raw bucket"
-
   event_pattern = jsonencode({
-    "source" = ["aws.cloudtrail"],
-    "detail-type" = ["AWS API Call via CloudTrail"],
-    "detail" = {
-      "eventSource" = ["s3.amazonaws.com"],
-      "eventName"   = ["PutObject", "CompleteMultipartUpload"],
-      "requestParameters" = {
-        "bucketName" = [var.raw_bucket_name]
-      }
+  "source" = ["aws.s3"],
+  "detail-type" = ["Object Created"],
+  "detail" = {
+    "bucket" = {
+      "name" = [var.raw_bucket_name]
     }
-  })
+  }
+})
+  # event_pattern = jsonencode({
+  #   "source" = ["aws.cloudtrail"],
+  #   "detail-type" = ["AWS API Call via CloudTrail"],
+  #   "detail" = {
+  #     "eventSource" = ["s3.amazonaws.com"],
+  #     "eventName"   = ["PutObject", "CompleteMultipartUpload"],
+  #     "requestParameters" = {
+  #       "bucketName" = [var.raw_bucket_name]
+  #     }
+  #   }
 }
 
 # EventBridge target to start Glue workflow
