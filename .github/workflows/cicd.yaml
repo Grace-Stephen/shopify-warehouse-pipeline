@@ -95,7 +95,7 @@ jobs:
     #         -var "master_password=${{ secrets.MASTER_PASSWORD }}" \
     #         -var "lambda_zip_key=lambda.zip"
 
-      # 8. Terraform destroy
+      ## 8. Terraform destroy
       - name: Terraform Destroy
         run: |
           terraform destroy -auto-approve \
